@@ -22,7 +22,6 @@ var keyDown=0;
 var keyPressed=0;
 
 var arrowRotation=90;
-var arrowShape=new Shape();
 
 var score=0;
 var lives=5;
@@ -41,10 +40,10 @@ var leftWindSound='wind_left';
 var rightWindSound='wind_right';
 
 var trap_image=new Image();
-trap_image.src="http://localhost/local/Cave_Escape/Images/Trap.png";
+trap_image.src="Images/Trap.png";
 
 var coin_image=new Image();
-coin_image.src="http://localhost/local/Cave_Escape/Images/Coin.png";
+coin_image.src="Images/Coin.png";
 
 dojo.ready(init);
 dojo.subscribe('/org/hark/pause', pauseCallBack);
@@ -78,18 +77,18 @@ function introduceGame()
 	audio.say({text : 'Before we get started, I am going to play some bumping sounds in each of your ears to make sure your headphones are on correctly. Here are some bumping sounds in your left ear: '});
 	
 	for(i=0;i<10;i++)
-		audio.play({url : 'http://localhost/local/Cave_Escape/Other_Sounds/bump_left_only'});
+		audio.play({url : 'Other_Sounds/bump_left_only'});
 	
 	audio.say({text : 'Here are some bumping sounds in your right ear: '});
 	
 	for(i=0;i<10;i++)
-		audio.play({url : 'http://localhost/local/Cave_Escape/Other_Sounds/bump_right_only'});
+		audio.play({url : 'Other_Sounds/bump_right_only'});
 	
 	audio.say({text : 'Welcome to Cave Escape! You are lost in a cave and are trying to get out. Rotate left and right using the left and right arrow keys, and use the up arrow key to go forward. Note, however that you cannot move backwards. Navigate through the cave by listening to the wind sounds in both of your ears. Once you escape, you move on to another cave, which is even harder than the one before it. Score points by collecting coins, but be sure to avoid the traps! If you fall into a trap, you die. If you lose all of your lives, the game is over. You start out with five lives, and there are ten levels to navigate through.'});
 	audio.say({text : 'Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: '});
-	audio.play({url : 'http://localhost/local/Cave_Escape/Treasure_Sounds/treasure'});
+	audio.play({url : 'Treasure_Sounds/treasure'});
 	audio.say({text : 'A trap nearby makes this sound: '});
-	audio.play({url : 'http://localhost/local/Cave_Escape/Trap_Sounds/trap'});
+	audio.play({url : 'Trap_Sounds/trap'});
 	audio.say({text : 'When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!'}).callAfter(initializeGame);
 }
 
@@ -115,9 +114,9 @@ function initializeGame()
 //Starts up the wind sounds
 function startWindSounds()
 {
-	audio.play({url : 'http://localhost/local/Cave_Escape/Wind_Sounds/'+windAheadSound, channel : 'custom'});
-	audio.play({url : 'http://localhost/local/Cave_Escape/Wind_Sounds/'+leftWindSound, channel : 'secondary'});
-	audio.play({url : 'http://localhost/local/Cave_Escape/Wind_Sounds/'+rightWindSound, channel : 'tertiary'});
+	audio.play({url : 'Wind_Sounds/'+windAheadSound, channel : 'custom'});
+	audio.play({url : 'Wind_Sounds/'+leftWindSound, channel : 'secondary'});
+	audio.play({url : 'Wind_Sounds/'+rightWindSound, channel : 'tertiary'});
 }
 
 //Initializes the level maps. 0's are blank spots, 1's are walls, 2's are traps, and 3's are coins
@@ -248,11 +247,6 @@ function draw()
 //Draw arrow
 function drawArrow(angle)
 {
-	/**arrowShape.graphics=new Graphics("beginFill('#000');var currentX=(xLocation+1)*(canvas.width/(levels[levelNumber-1][0].length+2));var currentY=(yLocation+1)*(canvas.height/(levels[levelNumber-1].length+2));moveTo(currentX+0.5*(canvas.width/(levels[levelNumber-1][0].length+2)), currentY);lineTo(currentX+(canvas.width/(levels[levelNumber-1][0].length+2)), currentY+0.5*(canvas.height/(levels[levelNumber-1].length+2)));lineTo(currentX+0.5*(canvas.width/(levels[levelNumber-1][0].length+2)), currentY+(canvas.height/(levels[levelNumber-1].length+2)));lineTo(currentX+0.5*(canvas.width/(levels[levelNumber-1][0].length+2)), currentY+0.6*(canvas.height/(levels[levelNumber-1].length+2)));lineTo(currentX, currentY+0.6*(canvas.height/(levels[levelNumber-1].length+2)));lineTo(currentX, currentY+0.4*(canvas.height/(levels[levelNumber-1].length+2)));lineTo(currentX+0.5*(canvas.width/(levels[levelNumber-1][0].length+2)), currentY+0.4*(canvas.height/(levels[levelNumber-1].length+2)));closePath();");
-	
-	arrowShape.draw(context2D, false);
-	arrowShape.visible=toDrawArrow;*/
-	
 	//Only draw arrow if it hasn't gone over trap
 	if(toDrawArrow)
 	{
@@ -500,7 +494,7 @@ function movePlayer()
 				score++;
 				
 				audio.stop();
-				audio.play({url: 'http://localhost/local/Cave_Escape/Treasure_Sounds/treasure_obtained'});
+				audio.play({url: 'Treasure_Sounds/treasure_obtained'});
 			}
 			
 			checkForObjects('treasure', true);
@@ -510,7 +504,7 @@ function movePlayer()
 			if(originalXLocation!=xLocation || originalYLocation!=yLocation)
 			{
 				audio.stop({channel : 'seventh'});
-				audio.play({url : 'http://localhost/local/Cave_Escape/Other_Sounds/walk', channel : 'seventh'});
+				audio.play({url : 'Other_Sounds/walk', channel : 'seventh'});
 				audio.setProperty({name : 'volume', value : FOOTSTEP_VOLUME, channel : 'seventh', immediate : true});
 			}
 		}
@@ -944,7 +938,7 @@ function pauseCallBack(paused)
 function playBumpSound()
 {
 	audio.stop({channel : 'four'});
-	audio.play({url: 'http://localhost/local/Cave_Escape/Other_Sounds/bump', channel : 'four'});
+	audio.play({url: 'Other_Sounds/bump', channel : 'four'});
 }
 
 //Play a falling sound when we run over a trap
@@ -955,7 +949,7 @@ function playFallingSound()
 	//Make sure any speech about our current location stops when we start falling
 	audio.stop({channel : 'eighth'});
 	
-	audio.play({ url: 'http://localhost/local/Cave_Escape/Other_Sounds/falling'}).callAfter(function()
+	audio.play({ url: 'Other_Sounds/falling'}).callAfter(function()
 	{
 		isFalling=false;
 		toDrawArrow=true;
@@ -995,7 +989,7 @@ function playFinishedSound()
 	{
 		if(levelNumber==10)
 		{
-			audio.play({url : 'http://localhost/local/Cave_Escape/Other_Sounds/cheer'});
+			audio.play({url : 'Other_Sounds/cheer'});
 			audio.say({text : 'You have completed all of the levels! If you would like to continue, you will start again at level one. If you do not want to continue, close the browser window.'});
 			initializeLevels();
 		}
@@ -1035,13 +1029,13 @@ function EvalObjectNearbySound(sound, checking_for_coin, distance)
 	if(checking_for_coin==false)
 	{
 		audio.stop({channel : 'fifth'});
-		audio.play({url : 'http://localhost/local/Cave_Escape/Trap_Sounds/'+sound, channel : 'fifth'});
+		audio.play({url : 'Trap_Sounds/'+sound, channel : 'fifth'});
 	}
 	
 	else
 	{
 		audio.stop({channel : 'sixth'});
-		audio.play({url : 'http://localhost/local/Cave_Escape/Treasure_Sounds/'+sound, channel : 'sixth'});
+		audio.play({url : 'Treasure_Sounds/'+sound, channel : 'sixth'});
 	}
 }
 
@@ -1062,6 +1056,6 @@ function endGame()
 	context2D.closePath();
 	context2D.fill();
 	
-	audio.play({url : 'http://localhost/local/Cave_Escape/Other_Sounds/game_over'});
+	audio.play({url : 'Other_Sounds/game_over'});
 	audio.say({text: 'You have fallen into a trap and died. Game over, Your final score is: '+score});
 }
