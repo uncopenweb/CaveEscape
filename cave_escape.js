@@ -2,7 +2,7 @@
 const FPS = 50;
 const SOUND_DECREASE_FACTOR=0.25;
 const FOOTSTEP_VOLUME=0.3;
-const VOLUMES=[0, 0.5, 1];
+const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
 
@@ -47,6 +47,7 @@ coin_image.src="Images/Coin.png";
 
 dojo.ready(init);
 dojo.subscribe('/org/hark/pause', pauseCallBack);
+dojo.subscribe('/org/hark/prefs/response', prefsCallback);
 
 document.onkeydown=onKeyDown;
 document.onkeyup=onKeyUp;
@@ -100,9 +101,9 @@ function initializeGame()
 	initializeLevels();
 	initializePlayer();
 	
-	audio.setProperty({name : 'volume', value : VOLUMES[1], channel : 'custom', immediate : true});
-	audio.setProperty({name : 'volume', value : VOLUMES[1], channel : 'secondary', immediate : true});
-	audio.setProperty({name : 'volume', value : VOLUMES[1], channel : 'tertiary', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'custom', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'secondary', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'tertiary', immediate : true});
 	
 	audio.setProperty({name : 'loop', value : true, channel : 'custom', immediate : true});
 	audio.setProperty({name : 'loop', value : true, channel : 'secondary', immediate : true});
@@ -355,23 +356,23 @@ function onKeyDown(evt)
 	if(isGameRunning && !isGameOver && !isFalling && !playingLivesLeft && !playingScoreSound && !playingFinishedSound && !introducing)
 	{
 		//Did we push the left arrow key?
-		if (evt.keyCode == 37)
+		if (evt.keyCode == 37 && !evt.shiftKey)
 			keyPressed = 1;
 	  
 		//Did we push the up arrow key?
-		else if (evt.keyCode == 38) 
+		else if (evt.keyCode == 38 && !evt.shiftKey) 
 			keyPressed = 2;
 			
 		//Did we push the right arrow key?
-		else if (evt.keyCode == 39)
+		else if (evt.keyCode == 39 && !evt.shiftKey)
 			keyPressed = 3;
 		
 		//Did we push the Enter key?
 		else if (evt.keyCode == 13)
 			playHints();
 		
-		//If we pressed one of the arrow keys, move if we can
-		if(evt.keyCode!=13)
+		//If we pressed one of the arrow keys without pressing shift, move if we can
+		if(evt.keyCode!=13 && !evt.shiftKey)
 			movePlayer();
 	}
 	
@@ -932,13 +933,55 @@ function playWindSound(sound, rotation)
 function pauseCallBack(paused)
 {
 	isGameRunning=!paused;
+	
+	//If the game is paused, stop all the audio channels.
+	if(!isGameRunning)
+		stopAllAudioChannels();
+	
+	//Otherwise, resume the sounds from where we last left off if needed
+	else
+	{
+	
+	}
+}
+
+function prefsCallback(prefs, which)
+{
+}
+
+//Stops all the audio channels from playing during a game pause
+function stopAllAudioChannels()
+{
+	audio.stop();
+	audio.stop({channel : 'custom'});
+	audio.stop({channel : 'secondary'});
+	audio.stop({channel : 'tertiary'});
+	audio.stop({channel : 'fourth'});
+	audio.stop({channel : 'fifth'});
+	audio.stop({channel : 'sixth'});
+	audio.stop({channel : 'seventh'});
+	audio.stop({channel : 'eighth'});
+}
+
+//Sets the speech rate of all the audio channels
+function setSpeechRate(rate)
+{
+	audio.setProperty({name : 'rate', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'custom', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'secondary', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'tertiary', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'fourth', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'fifth', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'sixth', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'seventh', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'eighth', value : rate, immediate : true});
 }
 
 //Plays a bumping sound when we hit a wall
 function playBumpSound()
 {
-	audio.stop({channel : 'four'});
-	audio.play({url: 'Other_Sounds/bump', channel : 'four'});
+	audio.stop({channel : 'fourth'});
+	audio.play({url: 'Other_Sounds/bump', channel : 'fourth'});
 }
 
 //Play a falling sound when we run over a trap
@@ -1016,9 +1059,9 @@ function playFinishedSound()
 //Play a certain wind sound
 function EvalWindSound(ahead_volume_level, left_volume_level, right_volume_level) 
 {
-	audio.setProperty({name : 'volume', value : VOLUMES[ahead_volume_level], channel : 'custom', immediate : true});
-	audio.setProperty({name : 'volume', value : VOLUMES[left_volume_level], channel : 'secondary', immediate : true});
-	audio.setProperty({name : 'volume', value : VOLUMES[right_volume_level], channel : 'tertiary', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[ahead_volume_level], channel : 'custom', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[left_volume_level], channel : 'secondary', immediate : true});
+	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[right_volume_level], channel : 'tertiary', immediate : true});
 }
 
 //Play a certain "object nearby" sound (whether the object is a coin or trap)
