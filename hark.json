@@ -2,7 +2,7 @@
       "identifier" : "url",
       "items" : [
           {
-              "url" : "CaveEscape",
+              "url" : "CaveEscape/Cave_Escape.htm",
               "label" : {
                   "en-us" : "Cave Escape"
     	      },
@@ -13,8 +13,8 @@
                   "en-us" : "You are lost in a cave, try to find your way out while gathering treasure and avoiding traps."             
 	      },
               "media" : {
-                  "icon" : "Images/Icon.png",
-                  "screenshots" : ['Images/Screenshot.png']
+                  "icon" : "CaveEscape/Images/Icon.png",
+                  "screenshots" : ['CaveEscape/Images/Screenshot.png']
               },
               "attribution" : "attribution.json"
           }

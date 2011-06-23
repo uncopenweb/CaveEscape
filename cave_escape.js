@@ -6,6 +6,10 @@ const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
 
+var masterVolume;
+var speechVolume;
+var soundVolume;
+
 var canvas = null;
 var context2D = null;
 
@@ -48,6 +52,7 @@ coin_image.src="Images/Coin.png";
 dojo.ready(init);
 dojo.subscribe('/org/hark/pause', pauseCallBack);
 dojo.subscribe('/org/hark/prefs/response', prefsCallback);
+dojo.publish('/org/hark/prefs/request');
 
 document.onkeydown=onKeyDown;
 document.onkeyup=onKeyUp;
@@ -101,9 +106,9 @@ function initializeGame()
 	initializeLevels();
 	initializePlayer();
 	
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'custom', immediate : true});
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'secondary', immediate : true});
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[1], channel : 'tertiary', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'custom', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'secondary', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'tertiary', immediate : true});
 	
 	audio.setProperty({name : 'loop', value : true, channel : 'custom', immediate : true});
 	audio.setProperty({name : 'loop', value : true, channel : 'secondary', immediate : true});
@@ -333,21 +338,26 @@ function playHints()
 	//Check for nearby traps, and tell about them if they exist
 	for(i=xLocation+1;i<levels[levelNumber-1][yLocation].length && levels[levelNumber-1][yLocation][i]!=1;i++)
 		if(levels[levelNumber-1][yLocation][i]==2)
-			audio.say({text : 'I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', channel : 'eighth'});
+			speak('I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', 'eighth');
+			//audio.say({text : 'I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', channel : 'eighth'});
 	
 	for(i=yLocation-1;i>=0 && levels[levelNumber-1][i][xLocation]!=1;i--)
 		if(levels[levelNumber-1][i][xLocation]==2)
-			audio.say({text : 'I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', channel : 'eighth'});
+			speak('I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', 'eighth');
+			//audio.say({text : 'I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', channel : 'eighth'});
 	
 	for(i=xLocation-1;i>=0 && levels[levelNumber-1][yLocation][i]!=1;i--)
 		if(levels[levelNumber-1][yLocation][i]==2)
-			audio.say({text : 'I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', channel : 'eighth'});
+			speak('I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', 'eighth');
+			//audio.say({text : 'I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', channel : 'eighth'});
 	
 	for(i=yLocation+1;i<levels[levelNumber-1].length && levels[levelNumber-1][i][xLocation]!=1;i++)
 		if(levels[levelNumber-1][i][xLocation]==2)
-			audio.say({text : 'I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', channel : 'eighth'});
+			speak('I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', 'eighth');
+			//audio.say({text : 'I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', channel : 'eighth'});
 	
-	audio.say({text : 'I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), channel : 'eighth'});
+	speak('I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), 'eighth');
+	//audio.say({text : 'I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), channel : 'eighth'});
 }
 
 //When we press a key and the game is not paused, respond appropriately
@@ -935,22 +945,28 @@ function pauseCallBack(paused)
 	isGameRunning=!paused;
 	
 	//If the game is paused, stop all the audio channels.
-	if(!isGameRunning)
+	/**if(!isGameRunning)
 		stopAllAudioChannels();
 	
 	//Otherwise, resume the sounds from where we last left off if needed
 	else
 	{
 	
-	}
+	}*/
 }
 
+//Updates properties of the game such as volume and speech rate when they are updated on the Hark site
 function prefsCallback(prefs, which)
 {
+	setSpeechRate(prefs.speechRate);
+	
+	masterVolume=prefs.volume;
+	speechVolume=prefs.speechVolume;
+	soundVolume=prefs.soundVolume;
 }
 
 //Stops all the audio channels from playing during a game pause
-function stopAllAudioChannels()
+/**function stopAllAudioChannels()
 {
 	audio.stop();
 	audio.stop({channel : 'custom'});
@@ -961,7 +977,7 @@ function stopAllAudioChannels()
 	audio.stop({channel : 'sixth'});
 	audio.stop({channel : 'seventh'});
 	audio.stop({channel : 'eighth'});
-}
+}*/
 
 //Sets the speech rate of all the audio channels
 function setSpeechRate(rate)
@@ -975,6 +991,20 @@ function setSpeechRate(rate)
 	audio.setProperty({name : 'rate', channel : 'sixth', value : rate, immediate : true});
 	audio.setProperty({name : 'rate', channel : 'seventh', value : rate, immediate : true});
 	audio.setProperty({name : 'rate', channel : 'eighth', value : rate, immediate : true});
+}
+
+//Speaks an utterance over a certain audio channel
+function speak(string, audioChannel)
+{
+	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*speechVolume, immediate : true});
+	audio.say({text : string, channel : audioChannel});
+}
+
+//Plays a certain sound over a certain audio channel
+function playSound(urlString, audioChannel, relativeVolume)
+{
+	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*soundVolume*relativeVolume, immediate : true});
+	audio.play({url : urlString, channel : audioChannel});
 }
 
 //Plays a bumping sound when we hit a wall
