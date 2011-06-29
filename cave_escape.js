@@ -1060,7 +1060,7 @@ function EvalObjectNearbySound(sound, checking_for_coin, distance)
 		playSound('Trap_Sounds/'+sound, 'fifth', Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), true);
 	
 	else
-		playSound('Treasure_Sounds/'+sound, channel : 'sixth', Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), true);
+		playSound('Treasure_Sounds/'+sound, 'sixth', Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), true);
 }
 
 //Ends the game if we run out of lives
