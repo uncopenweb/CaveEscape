@@ -1,7 +1,7 @@
 // target frames per second
 const FPS = 50;
 const SOUND_DECREASE_FACTOR=0.25;
-const FOOTSTEP_VOLUME=0.3;
+const RELATIVE_FOOTSTEP_VOLUME=0.3;
 const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
@@ -76,26 +76,26 @@ function introduceGame()
 	//Introduce game
 	var i;
 	
-	audio.setProperty({name : 'voice', value : 'en/en+f1'});
-	audio.say({text : 'Press the space bar at any time to skip past the instructions.'});
-	audio.setProperty({name : 'voice', value : 'default'});
+	audio.setProperty({name : 'voice', channel : 'default', value : 'en/en+f1'});
+	speak('Press the space bar at any time to skip past the instructions.', 'default', true);
+	audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
 	
-	audio.say({text : 'Before we get started, I am going to play some bumping sounds in each of your ears to make sure your headphones are on correctly. Here are some bumping sounds in your left ear: '});
-	
-	for(i=0;i<10;i++)
-		audio.play({url : 'Other_Sounds/bump_left_only'});
-	
-	audio.say({text : 'Here are some bumping sounds in your right ear: '});
+	speak('Before we get started, I am going to play some bumping sounds in each of your ears to make sure your headphones are on correctly. Here are some bumping sounds in your left ear: ', 'default', false);
 	
 	for(i=0;i<10;i++)
-		audio.play({url : 'Other_Sounds/bump_right_only'});
+		playSound('Other_Sounds/bump_left_only', 'default', 1, false);
 	
-	audio.say({text : 'Welcome to Cave Escape! You are lost in a cave and are trying to get out. Rotate left and right using the left and right arrow keys, and use the up arrow key to go forward. Note, however that you cannot move backwards. Navigate through the cave by listening to the wind sounds in both of your ears. Once you escape, you move on to another cave, which is even harder than the one before it. Score points by collecting coins, but be sure to avoid the traps! If you fall into a trap, you die. If you lose all of your lives, the game is over. You start out with five lives, and there are ten levels to navigate through.'});
-	audio.say({text : 'Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: '});
-	audio.play({url : 'Treasure_Sounds/treasure'});
-	audio.say({text : 'A trap nearby makes this sound: '});
-	audio.play({url : 'Trap_Sounds/trap'});
-	audio.say({text : 'When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!'}).callAfter(initializeGame);
+	speak('Here are some bumping sounds in your right ear: ', 'default', false);
+	
+	for(i=0;i<10;i++)
+		playSound('Other_Sounds/bump_right_only', 'default', 1, false);
+	
+	speak('Welcome to Cave Escape! You are lost in a cave and are trying to get out. Rotate left and right using the left and right arrow keys, and use the up arrow key to go forward. Note, however that you cannot move backwards. Navigate through the cave by listening to the wind sounds in both of your ears. Once you escape, you move on to another cave, which is even harder than the one before it. Score points by collecting coins, but be sure to avoid the traps! If you fall into a trap, you die. If you lose all of your lives, the game is over. You start out with five lives, and there are ten levels to navigate through.', 'default', false);
+	speak('Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: ', 'default', false);
+	playSound('Treasure_Sounds/treasure', 'default', 1, false);
+	speak('A trap nearby makes this sound: ', 'default', false);
+	playSound('Trap_Sounds/trap', 'default', 1, false);
+	speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false).callAfter(initializeGame);
 }
 
 //Actually initializes the game
@@ -105,10 +105,6 @@ function initializeGame()
 	
 	initializeLevels();
 	initializePlayer();
-	
-	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'custom', immediate : true});
-	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'secondary', immediate : true});
-	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[1], channel : 'tertiary', immediate : true});
 	
 	audio.setProperty({name : 'loop', value : true, channel : 'custom', immediate : true});
 	audio.setProperty({name : 'loop', value : true, channel : 'secondary', immediate : true});
@@ -120,9 +116,9 @@ function initializeGame()
 //Starts up the wind sounds
 function startWindSounds()
 {
-	audio.play({url : 'Wind_Sounds/'+windAheadSound, channel : 'custom'});
-	audio.play({url : 'Wind_Sounds/'+leftWindSound, channel : 'secondary'});
-	audio.play({url : 'Wind_Sounds/'+rightWindSound, channel : 'tertiary'});
+	playSound('Wind_Sounds/'+windAheadSound, 'custom', RELATIVE_VOLUMES[1], true);
+	playSound('Wind_Sounds/'+leftWindSound, 'secondary', RELATIVE_VOLUMES[1], true);
+	playSound('Wind_Sounds/'+rightWindSound, 'tertiary', RELATIVE_VOLUMES[1], true);
 }
 
 //Initializes the level maps. 0's are blank spots, 1's are walls, 2's are traps, and 3's are coins
@@ -333,31 +329,24 @@ function playHints()
 	var firstNumberToSpeak=arrowRotation%180!=0 ? yLocation : (levels[levelNumber-1][0].length-xLocation+1);
 	var secondNumberToSpeak=arrowRotation%180!=0 ? (levels[levelNumber-1][0].length-xLocation+1) : yLocation;
 	
-	audio.stop({channel : 'eighth'});
-	
 	//Check for nearby traps, and tell about them if they exist
 	for(i=xLocation+1;i<levels[levelNumber-1][yLocation].length && levels[levelNumber-1][yLocation][i]!=1;i++)
 		if(levels[levelNumber-1][yLocation][i]==2)
-			speak('I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', 'eighth');
-			//audio.say({text : 'I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', channel : 'eighth'});
-	
+			speak('I think I see a trap '+(i-xLocation)+((i-xLocation)>1 ? 'steps' : 'step')+relativeDirections[arrowRotation/90]+'your current location.', 'eighth', true);
+			
 	for(i=yLocation-1;i>=0 && levels[levelNumber-1][i][xLocation]!=1;i--)
 		if(levels[levelNumber-1][i][xLocation]==2)
-			speak('I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', 'eighth');
-			//audio.say({text : 'I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', channel : 'eighth'});
-	
+			speak('I think I see a trap '+(yLocation-i)+((yLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+3)%relativeDirections.length]+'your current location.', 'eighth', true);
+			
 	for(i=xLocation-1;i>=0 && levels[levelNumber-1][yLocation][i]!=1;i--)
 		if(levels[levelNumber-1][yLocation][i]==2)
-			speak('I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', 'eighth');
-			//audio.say({text : 'I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', channel : 'eighth'});
-	
+			speak('I think I see a trap '+(xLocation-i)+((xLocation-i)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+2)%relativeDirections.length]+'your current location.', 'eighth', true);
+			
 	for(i=yLocation+1;i<levels[levelNumber-1].length && levels[levelNumber-1][i][xLocation]!=1;i++)
 		if(levels[levelNumber-1][i][xLocation]==2)
-			speak('I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', 'eighth');
-			//audio.say({text : 'I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', channel : 'eighth'});
-	
-	speak('I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), 'eighth');
-	//audio.say({text : 'I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), channel : 'eighth'});
+			speak('I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', 'eighth', true);
+			
+	speak('I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), 'eighth', false);
 }
 
 //When we press a key and the game is not paused, respond appropriately
@@ -389,10 +378,10 @@ function onKeyDown(evt)
 	//Have we pressed the spacebar in order to skip the introduction?
 	if(introducing && evt.keyCode==32)
 	{
-		audio.stop();
+		audio.stop('default');
 		
 		//Set voice to default in case spacebar is pressed when female voice was speaking
-		audio.setProperty({name : 'voice', value : 'default'});
+		audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
 		
 		initializeGame();
 	}
@@ -504,8 +493,7 @@ function movePlayer()
 				levels[levelNumber-1][yLocation][xLocation]=0;
 				score++;
 				
-				audio.stop();
-				audio.play({url: 'Treasure_Sounds/treasure_obtained'});
+				playSound('Treasure_Sounds/treasure_obtained', 'default', 1, true);
 			}
 			
 			checkForObjects('treasure', true);
@@ -513,11 +501,7 @@ function movePlayer()
 			
 			//If we have moved, play walking sound
 			if(originalXLocation!=xLocation || originalYLocation!=yLocation)
-			{
-				audio.stop({channel : 'seventh'});
-				audio.play({url : 'Other_Sounds/walk', channel : 'seventh'});
-				audio.setProperty({name : 'volume', value : FOOTSTEP_VOLUME, channel : 'seventh', immediate : true});
-			}
+				playSound('Other_Sounds/walk', 'seventh', RELATIVE_FOOTSTEP_VOLUME, true);
 		}
 		
 		//Rotate right?
@@ -539,7 +523,6 @@ function movePlayer()
 //After we finish a level, advance to the next level
 function advanceToNextLevel()
 {	
-	audio.stop();
 	audio.stop({channel : 'custom'});
 	audio.stop({channel : 'secondary'});
 	audio.stop({channel : 'tertiary'});
@@ -943,16 +926,6 @@ function playWindSound(sound, rotation)
 function pauseCallBack(paused)
 {
 	isGameRunning=!paused;
-	
-	//If the game is paused, stop all the audio channels.
-	/**if(!isGameRunning)
-		stopAllAudioChannels();
-	
-	//Otherwise, resume the sounds from where we last left off if needed
-	else
-	{
-	
-	}*/
 }
 
 //Updates properties of the game such as volume and speech rate when they are updated on the Hark site
@@ -965,24 +938,10 @@ function prefsCallback(prefs, which)
 	soundVolume=prefs.soundVolume;
 }
 
-//Stops all the audio channels from playing during a game pause
-/**function stopAllAudioChannels()
-{
-	audio.stop();
-	audio.stop({channel : 'custom'});
-	audio.stop({channel : 'secondary'});
-	audio.stop({channel : 'tertiary'});
-	audio.stop({channel : 'fourth'});
-	audio.stop({channel : 'fifth'});
-	audio.stop({channel : 'sixth'});
-	audio.stop({channel : 'seventh'});
-	audio.stop({channel : 'eighth'});
-}*/
-
 //Sets the speech rate of all the audio channels
 function setSpeechRate(rate)
 {
-	audio.setProperty({name : 'rate', value : rate, immediate : true});
+	audio.setProperty({name : 'rate', channel : 'default', value : rate, immediate : true});
 	audio.setProperty({name : 'rate', channel : 'custom', value : rate, immediate : true});
 	audio.setProperty({name : 'rate', channel : 'secondary', value : rate, immediate : true});
 	audio.setProperty({name : 'rate', channel : 'tertiary', value : rate, immediate : true});
@@ -994,15 +953,21 @@ function setSpeechRate(rate)
 }
 
 //Speaks an utterance over a certain audio channel
-function speak(string, audioChannel)
+function speak(string, audioChannel, shouldStop)
 {
+	if(shouldStop)
+		audio.stop(audioChannel);
+		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*speechVolume, immediate : true});
 	audio.say({text : string, channel : audioChannel});
 }
 
 //Plays a certain sound over a certain audio channel
-function playSound(urlString, audioChannel, relativeVolume)
+function playSound(urlString, audioChannel, relativeVolume, shouldStop)
 {
+	if(shouldStop)
+		audio.stop(audioChannel);
+		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*soundVolume*relativeVolume, immediate : true});
 	audio.play({url : urlString, channel : audioChannel});
 }
@@ -1010,19 +975,16 @@ function playSound(urlString, audioChannel, relativeVolume)
 //Plays a bumping sound when we hit a wall
 function playBumpSound()
 {
-	audio.stop({channel : 'fourth'});
-	audio.play({url: 'Other_Sounds/bump', channel : 'fourth'});
+	playSound('Other_Sounds/bump', 'fourth', 1, true);
 }
 
 //Play a falling sound when we run over a trap
 function playFallingSound()
 {
-	audio.stop();
-	
 	//Make sure any speech about our current location stops when we start falling
 	audio.stop({channel : 'eighth'});
 	
-	audio.play({ url: 'Other_Sounds/falling'}).callAfter(function()
+	playSound('Other_Sounds/falling', 'default', 1, true).callAfter(function()
 	{
 		isFalling=false;
 		toDrawArrow=true;
@@ -1030,9 +992,8 @@ function playFallingSound()
 		if(lives>0)
 		{
 			playingLivesLeft=true;
-				
-			audio.stop();
-			audio.say({text: 'You have fallen into a trap and died. '+(lives==1 ? 'You have '+lives+ 'life left.' : 'You have '+lives+ 'lives left.')}).callAfter(function()
+			
+			speak('You have fallen into a trap and died. '+(lives==1 ? 'You have '+lives+ 'life left.' : 'You have '+lives+ 'lives left.'), 'default', false).callAfter(function()
 			{
 				playingLivesLeft=false;
 				initializePlayer();
@@ -1053,17 +1014,15 @@ function playFallingSound()
 //Says when we finish a level
 function playFinishedSound()
 {
-	audio.stop();
-	
 	//Make sure any speech about our current location stops when we finish the level
 	audio.stop({channel : 'eighth'});
 	
-	audio.say({ text: 'Congratulations! You have finished level '+levelNumber}).callAfter(function()
+	speak('Congratulations! You have finished level '+levelNumber, 'default', true).callAfter(function()
 	{
 		if(levelNumber==10)
 		{
-			audio.play({url : 'Other_Sounds/cheer'});
-			audio.say({text : 'You have completed all of the levels! If you would like to continue, you will start again at level one. If you do not want to continue, close the browser window.'});
+			playSound('Other_Sounds/cheer', 'default', 1, false);
+			speak('You have completed all of the levels! If you would like to continue, you will start again at level one. If you do not want to continue, close the browser window.', 'default', false);
 			initializeLevels();
 		}
 		
@@ -1076,7 +1035,7 @@ function playFinishedSound()
 		
 		playingScoreSound=true;
 	
-		audio.say({text: 'Your current score is: '+score+' You have '+lives+(lives==1 ? ' life left.' : 'lives left')}).callAfter(function()
+		speak('Your current score is: '+score+' You have '+lives+(lives==1 ? ' life left.' : 'lives left'), 'default', false).callAfter(function()
 		{
 			playingScoreSound=false;
 			arrowRotation=90;
@@ -1089,27 +1048,19 @@ function playFinishedSound()
 //Play a certain wind sound
 function EvalWindSound(ahead_volume_level, left_volume_level, right_volume_level) 
 {
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[ahead_volume_level], channel : 'custom', immediate : true});
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[left_volume_level], channel : 'secondary', immediate : true});
-	audio.setProperty({name : 'volume', value : RELATIVE_VOLUMES[right_volume_level], channel : 'tertiary', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[ahead_volume_level], channel : 'custom', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[left_volume_level], channel : 'secondary', immediate : true});
+	audio.setProperty({name : 'volume', value : masterVolume*soundVolume*RELATIVE_VOLUMES[right_volume_level], channel : 'tertiary', immediate : true});
 }
 
 //Play a certain "object nearby" sound (whether the object is a coin or trap)
 function EvalObjectNearbySound(sound, checking_for_coin, distance)
 {
-	audio.setProperty({name : 'volume', value : Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), channel : checking_for_coin ? 'sixth' : 'fifth', immediate : true});
-	
 	if(checking_for_coin==false)
-	{
-		audio.stop({channel : 'fifth'});
-		audio.play({url : 'Trap_Sounds/'+sound, channel : 'fifth'});
-	}
+		playSound('Trap_Sounds/'+sound, 'fifth', Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), true);
 	
 	else
-	{
-		audio.stop({channel : 'sixth'});
-		audio.play({url : 'Treasure_Sounds/'+sound, channel : 'sixth'});
-	}
+		playSound('Treasure_Sounds/'+sound, channel : 'sixth', Math.pow(1-SOUND_DECREASE_FACTOR, distance-1), true);
 }
 
 //Ends the game if we run out of lives
@@ -1117,7 +1068,6 @@ function endGame()
 {
 	isGameOver=true;
 	
-	audio.stop();
 	audio.stop({channel : 'custom'});
 	audio.stop({channel : 'secondary'});
 	audio.stop({channel : 'tertiary'});
@@ -1129,6 +1079,6 @@ function endGame()
 	context2D.closePath();
 	context2D.fill();
 	
-	audio.play({url : 'Other_Sounds/game_over'});
-	audio.say({text: 'You have fallen into a trap and died. Game over, Your final score is: '+score});
+	playSound('Other_Sounds/game_over', 'default', 1, false);
+	speak('You have fallen into a trap and died. Game over, Your final score is: '+score, 'default', false);
 }
