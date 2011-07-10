@@ -956,7 +956,7 @@ function setSpeechRate(rate)
 function speak(string, audioChannel, shouldStop, afterFunction)
 {
 	if(shouldStop)
-		audio.stop({channel : audioChannel});
+		audio.stop(audioChannel);
 		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*speechVolume, immediate : true});
 	audio.say({text : string, channel : audioChannel}).callAfter(afterFunction);
@@ -966,13 +966,13 @@ function speak(string, audioChannel, shouldStop, afterFunction)
 function playSound(urlString, audioChannel, relativeVolume, shouldStop, afterFunction)
 {
 	if(shouldStop)
-		audio.stop({channel : audioChannel});
+		audio.stop(audioChannel);
 		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*soundVolume*relativeVolume, immediate : true});
 	audio.play({url : urlString, channel : audioChannel}).callAfter(afterFunction);
 }
 
-//A "do nothing" function that is called if nothing is to occur after certain speech or sounds
+//A "do nothing" function for when we don't want to do anything after a sound finishes
 function none()
 {
 
@@ -1086,5 +1086,5 @@ function endGame()
 	context2D.fill();
 	
 	playSound('Other_Sounds/game_over', 'default', 1, false, none);
-	speak('You have fallen into a trap and died. Game over, Your final score is: '+score, 'default', false, none);
+	speak('You have fallen into a trap and died. Game over, Your final score is: '+score, 'default', false);
 }
