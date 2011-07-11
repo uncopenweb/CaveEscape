@@ -934,6 +934,7 @@ function pauseCallBack(paused)
 function prefsCallback(prefs, which)
 {
 	setSpeechRate(prefs.speechRate);
+	playWindSound('wind', arrowRotation); //Adjust wind sound volumes, since wind sounds last so long
 	
 	masterVolume=prefs.volume;
 	speechVolume=prefs.speechVolume;
