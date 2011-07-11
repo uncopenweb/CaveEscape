@@ -6,9 +6,9 @@ const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
 
-var masterVolume;
-var speechVolume;
-var soundVolume;
+var masterVolume=1;
+var speechVolume=1;
+var soundVolume=1;
 
 var canvas = null;
 var context2D = null;
@@ -329,6 +329,8 @@ function playHints()
 	var firstNumberToSpeak=arrowRotation%180!=0 ? yLocation : (levels[levelNumber-1][0].length-xLocation+1);
 	var secondNumberToSpeak=arrowRotation%180!=0 ? (levels[levelNumber-1][0].length-xLocation+1) : yLocation;
 	
+	audio.stop({channel : 'eighth'});
+	
 	//Check for nearby traps, and tell about them if they exist
 	for(i=xLocation+1;i<levels[levelNumber-1][yLocation].length && levels[levelNumber-1][yLocation][i]!=1;i++)
 		if(levels[levelNumber-1][yLocation][i]==2)
@@ -378,7 +380,7 @@ function onKeyDown(evt)
 	//Have we pressed the spacebar in order to skip the introduction?
 	if(introducing && evt.keyCode==32)
 	{
-		audio.stop('default');
+		audio.stop({channel : 'default'});
 		
 		//Set voice to default in case spacebar is pressed when female voice was speaking
 		audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
@@ -956,7 +958,7 @@ function setSpeechRate(rate)
 function speak(string, audioChannel, shouldStop, afterFunction)
 {
 	if(shouldStop)
-		audio.stop(audioChannel);
+		audio.stop({channel : audioChannel});
 		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*speechVolume, immediate : true});
 	audio.say({text : string, channel : audioChannel}).callAfter(afterFunction);
@@ -966,7 +968,7 @@ function speak(string, audioChannel, shouldStop, afterFunction)
 function playSound(urlString, audioChannel, relativeVolume, shouldStop, afterFunction)
 {
 	if(shouldStop)
-		audio.stop(audioChannel);
+		audio.stop({channel : audioChannel});
 		
 	audio.setProperty({name : 'volume', channel : audioChannel, value : masterVolume*soundVolume*relativeVolume, immediate : true});
 	audio.play({url : urlString, channel : audioChannel}).callAfter(afterFunction);
