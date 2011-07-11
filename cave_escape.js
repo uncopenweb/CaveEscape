@@ -6,9 +6,9 @@ const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
 
-var masterVolume;
-var speechVolume;
-var soundVolume;
+var masterVolume=0;
+var speechVolume=0;
+var soundVolume=0;
 
 var canvas = null;
 var context2D = null;
@@ -52,7 +52,6 @@ coin_image.src="Images/Coin.png";
 dojo.ready(init);
 dojo.subscribe('/org/hark/pause', pauseCallBack);
 dojo.subscribe('/org/hark/prefs/response', prefsCallback);
-dojo.publish('/org/hark/prefs/request');
 
 document.onkeydown=onKeyDown;
 document.onkeyup=onKeyUp;
@@ -66,6 +65,7 @@ function init()
 	uow.getAudio().then(function(a)
 	{
 		audio=a;
+		dojo.publish('/org/hark/prefs/request');
 		introduceGame();
 	});
 }
