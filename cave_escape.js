@@ -6,9 +6,9 @@ const RELATIVE_VOLUMES=[0, 0.5, 1];
 
 var audio=null;
 
-var masterVolume=1;
-var speechVolume=1;
-var soundVolume=1;
+var masterVolume;
+var speechVolume;
+var soundVolume;
 
 var canvas = null;
 var context2D = null;
