@@ -75,7 +75,6 @@ function introduceGame()
 {
 	//Introduce game
 	var i;
-	initializeLevels();
 	
 	audio.setProperty({name : 'voice', channel : 'default', value : 'en/en+f1'});
 	speak('Press the space bar at any time to skip past the instructions.', 'default', true, none);
@@ -104,6 +103,7 @@ function initializeGame()
 {
 	introducing=false;
 	
+	initializeLevels();
 	initializePlayer();
 	
 	audio.setProperty({name : 'loop', value : true, channel : 'custom', immediate : true});
@@ -934,7 +934,9 @@ function pauseCallBack(paused)
 function prefsCallback(prefs, which)
 {
 	setSpeechRate(prefs.speechRate);
-	playWindSound('wind', arrowRotation); //Adjust wind sound volumes, since wind sounds last so long
+	
+	if(!introducing)
+		playWindSound('wind', arrowRotation); //Adjust wind sound volumes, since wind sounds last so long (unless we are introducing the game)
 	
 	masterVolume=prefs.volume;
 	speechVolume=prefs.speechVolume;
