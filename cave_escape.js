@@ -75,6 +75,7 @@ function introduceGame()
 {
 	//Introduce game
 	var i;
+	initializeLevels();
 	
 	audio.setProperty({name : 'voice', channel : 'default', value : 'en/en+f1'});
 	speak('Press the space bar at any time to skip past the instructions.', 'default', true, none);
@@ -103,7 +104,6 @@ function initializeGame()
 {
 	introducing=false;
 	
-	initializeLevels();
 	initializePlayer();
 	
 	audio.setProperty({name : 'loop', value : true, channel : 'custom', immediate : true});
