@@ -94,9 +94,13 @@ function introduceGame()
 	speak('Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: ', 'default', false, none);
 	playSound('Treasure_Sounds/treasure', 'default', 1, false, none);
 	speak('A trap nearby makes this sound: ', 'default', false, none);
-	playSound('Trap_Sounds/trap', 'default', 1, false, none);*/
-	//speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);
-	audio.say({text : 'When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', channel : 'default'}).callAfter(initializeGame);
+	playSound('Trap_Sounds/trap', 'default', 1, false, none);
+	speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);*/
+	
+	audio.say({text : 'Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: ', channel : 'default'}).callAfter(function()
+	{
+		audio.say({text : 'When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', channel : 'default'}).callAfter(initializeGame);
+	});
 }
 
 //Actually initializes the game
