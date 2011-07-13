@@ -95,7 +95,8 @@ function introduceGame()
 	playSound('Treasure_Sounds/treasure', 'default', 1, false, none);
 	speak('A trap nearby makes this sound: ', 'default', false, none);
 	playSound('Trap_Sounds/trap', 'default', 1, false, none);*/
-	speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);
+	//speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);
+	audio.say({text : 'When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', channel : 'default'}).callAfter(initializeGame);
 }
 
 //Actually initializes the game
