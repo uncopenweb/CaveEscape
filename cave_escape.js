@@ -38,6 +38,7 @@ var playingLivesLeft=false;
 var playingScoreSound=false;
 var playingFinishedSound=false;
 var introducing=true;
+var givingHint=false;
 
 var windAheadSound='wind_ahead';
 var leftWindSound='wind_left';
@@ -77,40 +78,21 @@ function introduceGame()
 	var i;
 	
 	audio.setProperty({name : 'voice', channel : 'default', value : 'en/en+f1'});
+	speak('Press the space bar at any time to skip past the instructions.', 'default', true, none);
+	audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
 	
-	speak('Press the space bar at any time to skip past the instructions.', 'default', true, function()
-	{
-		audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
-		
-		speak('Before we get started, I am going to play some bumping sounds in each of your ears to make sure your headphones are on correctly. Here are some bumping sounds in your left ear: ', 'default', false, function()
-		{
-			playSound('Other_Sounds/bump_left_only', 'default', 1, false, function()
-			{
-				speak('Here are some bumping sounds in your right ear: ', 'default', false, function()
-				{
-					playSound('Other_Sounds/bump_right_only', 'default', 1, false, function()
-					{
-						speak('Welcome to Cave Escape! You are lost in a cave and are trying to get out. Rotate left and right using the left and right arrow keys, and use the up arrow key to go forward. Note, however that you cannot move backwards. Navigate through the cave by listening to the wind sounds in both of your ears. Once you escape, you move on to another cave, which is even harder than the one before it. Score points by collecting coins, but be sure to avoid the traps! If you fall into a trap, you die. If you lose all of your lives, the game is over. You start out with five lives, and there are ten levels to navigate through.', 'default', false, function()
-						{
-							speak('Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: ', 'default', false, function()
-							{
-								playSound('Treasure_Sounds/treasure', 'default', 1, false, function()
-								{
-									speak('A trap nearby makes this sound: ', 'default', false, function()
-									{
-										playSound('Trap_Sounds/trap', 'default', 1, false, function()
-										{
-											speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);
-										});
-									});
-								});
-							});
-						});
-					});
-				});
-			});
-		});
-	});
+	speak('Before we get started, I am going to play some bumping sounds in each of your ears to make sure your headphones are on correctly. Here are some bumping sounds in your left ear: ', 'default', false, none);
+	playSound('Other_Sounds/bump_left_only', 'default', 1, false, none);
+	
+	speak('Here are some bumping sounds in your right ear: ', 'default', false, none);
+	playSound('Other_Sounds/bump_right_only', 'default', 1, false, none);
+	
+	speak('Welcome to Cave Escape! You are lost in a cave and are trying to get out. Rotate left and right using the left and right arrow keys, and use the up arrow key to go forward. Note, however that you cannot move backwards. Navigate through the cave by listening to the wind sounds in both of your ears. Once you escape, you move on to another cave, which is even harder than the one before it. Score points by collecting coins, but be sure to avoid the traps! If you fall into a trap, you die. If you lose all of your lives, the game is over. You start out with five lives, and there are ten levels to navigate through.', 'default', false, none);
+	speak('Here are some hints for doing well in this game: Make sure that your head phones are on correctly. If your head phones are on backwards, you will not hear the sounds correctly and get lost. When there is an opening to your left or right, you will hear more wind on that side. If you hear no wind at all, you are facing a dead end. Just turn and you will hear wind again. If you get totally lost, press the enter key for hints about your current location. A coin nearby makes this sound: ', 'default', false, none);
+	playSound('Treasure_Sounds/treasure', 'default', 1, false, none);
+	speak('A trap nearby makes this sound: ', 'default', false, none);
+	playSound('Trap_Sounds/trap', 'default', 1, false, none);
+	speak('When there is a coin or trap nearby, you will hear it in the ear which is in the same direction as the object. The most important hint, however, is to have fun. Good luck!', 'default', false, initializeGame);
 }
 
 //Actually initializes the game
@@ -338,6 +320,8 @@ function drawArrow(angle)
 //Tells us about our current orientation, where we are relative to the exit, and about any traps nearby
 function playHints()
 {
+	givingHint=true;
+	
 	var relativeDirections=['ahead of', 'to the right of', 'behind', 'to the left of'];
 	var i;
 	
@@ -363,7 +347,10 @@ function playHints()
 		if(levels[levelNumber-1][i][xLocation]==2)
 			speak('I think I see a trap '+(i-yLocation)+((i-yLocation)>1 ? 'steps' : 'step')+relativeDirections[(arrowRotation/90+1)%relativeDirections.length]+'your current location.', 'eighth', true, none);
 			
-	speak('I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), 'eighth', false, none);
+	speak('I think I see the exit '+(firstNumberToSpeak==0 ? "" : firstNumberToSpeak+(firstNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? (arrowRotation/90+3)%relativeDirections.length : arrowRotation/90)]+(secondNumberToSpeak>0 ? ' you and ' : ' your current location.'))+(secondNumberToSpeak==0 ? "" : secondNumberToSpeak+(secondNumberToSpeak!=1 ? ' steps ' : ' step ')+relativeDirections[(arrowRotation%180!=0 ? arrowRotation/90 : (arrowRotation/90+3)%relativeDirections.length)]+' your current location.'), 'eighth', false, function()
+	{
+		givingHint=false;
+	});
 }
 
 //When we press a key and the game is not paused, respond appropriately
@@ -395,10 +382,7 @@ function onKeyDown(evt)
 	//Have we pressed the spacebar in order to skip the introduction?
 	if(introducing && evt.keyCode==32)
 	{
-		var j;
-		
-		for(j=0;j<11;j++)
-			audio.stop({channel : 'default'});
+		audio.stop({channel : 'default'});
 		
 		//Set voice to default in case spacebar is pressed when female voice was speaking
 		audio.setProperty({name : 'voice', channel : 'default', value : 'default'});
@@ -959,6 +943,9 @@ function prefsCallback(prefs, which)
 	masterVolume=prefs.volume;
 	speechVolume=prefs.speechVolume;
 	soundVolume=prefs.soundVolume;
+	
+	if(introducing || givingHint) //Volume adjustment during long speeches
+		audio.setProperty({name : 'volume', value : masterVolume*speechVolume, channel : 'default', immediate : true});
 }
 
 //Sets the speech rate of all the audio channels
