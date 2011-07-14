@@ -944,9 +944,9 @@ function prefsCallback(prefs, which)
 	speechVolume=prefs.speechVolume;
 	soundVolume=prefs.soundVolume;
 	
-	//Volume adjustment during long speeches
-	if(introducing || givingHint)
-		audio.setProperty({name : 'volume', value : masterVolume*speechVolume, channel : (introducing ? 'default' : 'eighth'), immediate : true});
+	//Volume adjustment during long speeches and sounds
+	if(introducing || givingHint || isFalling || playingFinishedSound || playingScoreSound || playingLivesLeft || isGameOver)
+		audio.setProperty({name : 'volume', value : masterVolume*speechVolume, channel : (givingHint ? 'eighth' : 'default'), immediate : true});
 }
 
 //Sets the speech rate of all the audio channels
