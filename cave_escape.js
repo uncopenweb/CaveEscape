@@ -51,8 +51,6 @@ var coin_image=new Image();
 coin_image.src="Images/Coin.png";
 
 dojo.ready(init);
-dojo.subscribe('/org/hark/pause', pauseCallBack);
-dojo.subscribe('/org/hark/prefs/response', prefsCallback);
 
 document.onkeydown=onKeyDown;
 document.onkeyup=onKeyUp;
@@ -62,6 +60,9 @@ function init()
 {
 	canvas = document.getElementById('canvas');
     context2D = canvas.getContext('2d');
+	
+	dojo.subscribe('/org/hark/pause', pauseCallBack);
+	dojo.subscribe('/org/hark/prefs/response', prefsCallback);
 	
 	uow.getAudio().then(function(a)
 	{
